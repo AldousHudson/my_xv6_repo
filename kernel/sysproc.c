@@ -113,7 +113,7 @@ sys_trace(void)
 
 // 收集xv6运行的一些信息：当前剩余的内存字节数；状态为UNUSED 的进程个数；当前进程可用文件描述符的数量
 uint64
-sys_info(void)
+sys_sysinfo(void)
 {
   uint64 addr;
   struct sysinfo info;
@@ -124,7 +124,7 @@ sys_info(void)
   info.freemem = get_freemem();
   info.nproc   = get_nproc();
   info.freefd  = get_freefd();
-  // 将内核地址空间中填写的结构体复制到用户地址空间
+  // 将内核态地址中填写的结构体复制到用户态地址
   if(copyout(myproc()->pagetable, addr, (char *)&info, sizeof(info)) < 0)
     return -1;
   return 0;
