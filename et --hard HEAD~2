@@ -1,0 +1,263 @@
+[33mcommit 0c2fe18d61fbb931d88de79c60f04775622183fa[m[33m ([m[1;36mHEAD -> [m[1;32mlock[m[33m)[m
+Author: AldousHudson <aldoushudson4@gmail.com>
+Date:   Sat Oct 22 07:41:02 2022 +0000
+
+    提交time.txt
+
+[33mcommit 3c73c1873d055a007da00f64d454bd0c1fcc34b1[m
+Author: AldousHudson <aldoushudson4@gmail.com>
+Date:   Sat Oct 22 07:23:11 2022 +0000
+
+    完成任务二：磁盘缓存
+
+[33mcommit f16fd85e90bbc4ba96d181e3995e7e68cc1ba5c0[m
+Author: AldousHudson <aldoushudson4@gmail.com>
+Date:   Sat Oct 22 02:48:53 2022 +0000
+
+    完成任务一：内存分配器
+
+[33mcommit a4eaf20da42a8777be05502dc342633ec97c3029[m
+Author: Frans Kaashoek <kaashoek@mit.edu>
+Date:   Fri Oct 23 07:16:15 2020 -0400
+
+    Still print bufer
+
+[33mcommit cf05087566e16771bcbf0ab3ad82a3d20f3d66d1[m
+Author: Frans Kaashoek <kaashoek@mit.edu>
+Date:   Thu Oct 22 21:05:23 2020 -0400
+
+    Allow bcachetest to be run many times
+
+[33mcommit 1b541d038288bbedaa843b51836cd3b1ffeb2aac[m
+Author: Frans Kaashoek <kaashoek@mit.edu>
+Date:   Thu Oct 22 14:40:39 2020 -0400
+
+    x
+
+[33mcommit 055f8802d360717e2a749817fd7b0a9b712fcc01[m
+Author: Frans Kaashoek <kaashoek@mit.edu>
+Date:   Mon Oct 19 18:31:55 2020 -0400
+
+    Update for dynamic locks
+
+[33mcommit 3893422a78b9bd9b81a82b2f3f22a9c7e0c8d4a5[m
+Author: Frans Kaashoek <kaashoek@mit.edu>
+Date:   Wed Oct 14 12:30:31 2020 -0400
+
+    x
+
+[33mcommit 37724bd290b0a0f194238220ccb3da5faf43b151[m
+Author: Frans Kaashoek <kaashoek@mit.edu>
+Date:   Wed Oct 14 12:28:15 2020 -0400
+
+    lock lab
+
+[33mcommit 075d0f0c4a870ce2c825f41e111bfdf75a877cae[m
+Merge: 62d97e3 806580d
+Author: Frans Kaashoek <kaashoek@mit.edu>
+Date:   Wed Oct 7 19:24:40 2020 -0400
+
+    Merge remote-tracking branch 'xv6-dev/riscv' into riscv
+
+[33mcommit 806580d6423274e7b38329362f64a549e04ddbab[m
+Author: Robert Morris <rtm@csail.mit.edu>
+Date:   Wed Oct 7 12:57:55 2020 -0400
+
+    set riscv use-compressed-breakpoints yes
+
+[33mcommit 6c167595037a0872338d999c7ce0971a5606dedb[m
+Author: Robert Morris <rtm@csail.mit.edu>
+Date:   Mon Oct 5 15:28:01 2020 -0400
+
+    more explicable scratch area size for machine-mode timer interrupts
+
+[33mcommit 0c55849d28a2df0416d28c83bc9da47411e2c78f[m
+Author: Frans Kaashoek <kaashoek@mit.edu>
+Date:   Mon Oct 5 09:17:47 2020 -0400
+
+    Don't map the CLINT, since it never used in the kernel in supervisor mode
+
+[33mcommit a9b3dd457c647d2836080af4f1cd7c7cb4d1a40d[m
+Author: Robert Morris <rtm@csail.mit.edu>
+Date:   Mon Oct 5 06:59:33 2020 -0400
+
+    eliminate virtio DMA into kernel stacks.
+
+[33mcommit 271d89ae3065d397e26faa8e05aeec5cc3cd8934[m
+Author: Robert Morris <rtm@csail.mit.edu>
+Date:   Mon Oct 5 06:26:58 2020 -0400
+
+    improve virtio_disk comments; bring it closer to wording in the spec
+
+[33mcommit da002a48fbbf69a0d965755d9f6b66817e8a15a5[m
+Author: Robert Morris <rtm@csail.mit.edu>
+Date:   Sun Oct 4 13:29:04 2020 -0400
+
+    don't unpin if recovering -- the resulting negative refcnt suppresses next unpin
+
+[33mcommit 792d60e91224bc15ce41aaff2560a82b63fdf06f[m
+Author: Robert Morris <rtm@csail.mit.edu>
+Date:   Sun Oct 4 09:21:03 2020 -0400
+
+    avoid deadlock by disk intr acking interrupt first, then processing ring
+
+[33mcommit e3672e018aaaadafccc3634911d69f46ec4b4819[m
+Author: Robert Morris <rtm@csail.mit.edu>
+Date:   Sun Oct 4 08:44:32 2020 -0400
+
+    often causes deadlock after a few minutes
+
+[33mcommit b9359c353318ba70596b55ec57f8d9f6c43c2758[m
+Author: Matt Harvey <matt@teamdawg.org>
+Date:   Mon Sep 14 14:49:57 2020 -0700
+
+    Corrects order of UART RX/TX interrupt enable bits
+    
+    (per http://byterunner.com/16550.html and manually tested in qemu bare metal echo)
+
+[33mcommit b96547403df0e07865bc2269215cfeb0260b893d[m
+Author: Fumiya Shigemitsu <shfy1014@gmail.com>
+Date:   Mon Oct 21 21:01:07 2019 +0900
+
+    Fix minor typos
+
+[33mcommit 1c4b582fc74a3b6192f7a1aba1c667b1b5e840bd[m
+Author: Frans Kaashoek <kaashoek@mit.edu>
+Date:   Sat Oct 3 10:21:04 2020 -0400
+
+    Clarify CLINT and PLIC acronym
+
+[33mcommit 62d97e3fce1a223b84226cda05c0af73637129b0[m
+Merge: db7d48d d9c7b13
+Author: Frans Kaashoek <kaashoek@mit.edu>
+Date:   Fri Oct 2 08:59:06 2020 -0400
+
+    Merge remote-tracking branch 'xv6-dev/riscv' into riscv
+
+[33mcommit d9c7b13acce9ac17e550ec02799edf8da059d78a[m
+Author: Frans Kaashoek <kaashoek@mit.edu>
+Date:   Fri Oct 2 07:51:15 2020 -0400
+
+    Add s to many printf statements that expect it (thanks Cece Chu)
+    Add dirtest to the list of tests
+
+[33mcommit db7d48ddd7af0d556314306f5649c4196742ff30[m
+Author: Frans Kaashoek <kaashoek@mit.edu>
+Date:   Thu Oct 1 09:23:33 2020 -0400
+
+    Avoid WFI until the system is idle.
+
+[33mcommit 3ac513c0a4187363b797b052b7d677674a11a021[m
+Author: Frans Kaashoek <kaashoek@mit.edu>
+Date:   Thu Sep 24 13:18:54 2020 -0400
+
+    When either_copyin/out fails, return an error from write/read
+    
+    Add a test to check that read/write return an error
+
+[33mcommit 788b4d1bc9a761212fe4f611cb02e8d34aca1775[m
+Merge: 2055fe1 05074ba
+Author: Robert Morris <rtm@csail.mit.edu>
+Date:   Wed Sep 30 17:16:05 2020 -0400
+
+    Merge branch 'riscv' of g.csail.mit.edu:xv6-dev into riscv
+
+[33mcommit 05074badc447ce9532824924bfc41a003579beb0[m
+Author: Frans Kaashoek <kaashoek@mit.edu>
+Date:   Thu Sep 24 13:18:54 2020 -0400
+
+    When either_copyin/out fails, return an error from write/read
+    
+    Add a test to check that read/write return an error
+
+[33mcommit 2055fe13ac413a53d74baafdfa47e4c892ff9dc9[m
+Author: Robert Morris <rtm@csail.mit.edu>
+Date:   Sun Sep 6 14:20:18 2020 -0400
+
+    better grind error messages
+
+[33mcommit a92b3edf1d77f9e70f520d31074a5774ef75f15b[m
+Author: Frans Kaashoek <kaashoek@mit.edu>
+Date:   Wed Sep 2 18:52:35 2020 -0400
+
+    Don't call WFI for LAB_FS
+
+[33mcommit 4e1967f1888f2cc8e50d31774273888a26acf92e[m
+Author: Frans Kaashoek <kaashoek@mit.edu>
+Date:   Tue Sep 1 22:34:21 2020 -0400
+
+    wfi to save CPU time on Athena
+
+[33mcommit e23d53f27f6e187732a92a2b4705639d1c260f05[m
+Author: Frans Kaashoek <kaashoek@mit.edu>
+Date:   Fri Aug 28 16:21:07 2020 -0400
+
+    Delete doc dir because they take much space in student submissions
+
+[33mcommit ffb2ee074a42ed30a87fd6804682fa62eca13500[m
+Author: Robert Morris <rtm@csail.mit.edu>
+Date:   Fri Aug 28 05:51:48 2020 -0400
+
+    move panicked check to uart.c
+
+[33mcommit db067d24da0b6472afe9ce4165e0868772b11964[m
+Author: Robert Morris <rtm@csail.mit.edu>
+Date:   Fri Aug 28 05:44:09 2020 -0400
+
+    suppress write() output after panic()
+
+[33mcommit 2ec9c6ed66629fd5b833f06af2080eab46c0af35[m
+Author: Frans Kaashoek <kaashoek@mit.edu>
+Date:   Thu Aug 27 07:05:13 2020 -0400
+
+    Remove obselete ifdef that shouldn't have been there ever
+
+[33mcommit d7e5f269106f4b76fcbd90331a3b44f879ee9c54[m
+Author: Robert Morris <rtm@csail.mit.edu>
+Date:   Thu Aug 27 06:21:10 2020 -0400
+
+    fix usertests to pass all the riscv-sol-fall20 solutions.
+
+[33mcommit efaa7b8e2ae2ae059f3985bda718d91f3501b294[m
+Author: Frans Kaashoek <kaashoek@mit.edu>
+Date:   Fri Aug 21 10:55:34 2020 -0400
+
+    Adjust a few prototypes to be explicit that they don't take arguments
+
+[33mcommit 59a9863a17d881498bf7519878566f74341a1b71[m
+Author: Robert Morris <rtm@csail.mit.edu>
+Date:   Wed Aug 19 13:10:14 2020 -0400
+
+    touch sbrk()-allocated memory to make sure it exists
+
+[33mcommit aefa2697d705e316aa5255004e4b6a129e9afe2a[m
+Author: Robert Morris <rtm@csail.mit.edu>
+Date:   Wed Aug 19 12:35:14 2020 -0400
+
+    usertest for exec() out of memory recovery
+    and fix a few exec() bugs
+
+[33mcommit b33574df38f358ba2173caa92e8287b5b0cb9cff[m
+Author: Frans Kaashoek <kaashoek@mit.edu>
+Date:   Tue Aug 18 20:48:53 2020 -0400
+
+    Use the major number defined in file.h.  The minor number is ignored;
+    might as well use 0.
+
+[33mcommit 740d36373630e519117077f867437c9abbfd1f8d[m
+Author: Frans Kaashoek <kaashoek@mit.edu>
+Date:   Mon Aug 17 14:25:12 2020 -0400
+
+    Delete some obselete stuff
+
+[33mcommit b154cf091c57db1b412a022490c0cec009b4cf6b[m
+Author: Robert Morris <rtm@csail.mit.edu>
+Date:   Sat Aug 15 05:46:32 2020 -0400
+
+    x
+
+[33mcommit 4a87a0ae8bc4a186842fb5f57454412de56f52bc[m
+Author: Robert Morris <rtm@csail.mit.edu>
+Date:   Thu Aug 13 14:10:58 2020 -0400
+
+    f
