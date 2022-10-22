@@ -82,8 +82,6 @@ bget(uint dev, uint blockno)
   // Is the block already cached?
   for(b = bcache.hashbucket[hash].next; b != &bcache.hashbucket[hash]; b = b->next){
     if(b->dev == dev && b->blockno == blockno){
-      // 记录buf的时间戳
-      b->timestamp = ticks;
       b->refcnt++;
       release(&bcache.lock[hash]);
       acquiresleep(&b->lock);
@@ -100,8 +98,6 @@ bget(uint dev, uint blockno)
       acquire(&bcache.lock[i]);
       for(b = bcache.hashbucket[i].prev; b != &bcache.hashbucket[i]; b = b->prev){
         if(b->refcnt == 0){
-          // 记录buf的时间戳
-          b->timestamp = ticks;
           b->dev = dev;
           b->blockno = blockno;
           b->valid = 0;
