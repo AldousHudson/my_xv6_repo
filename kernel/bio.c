@@ -99,7 +99,7 @@ bget(uint dev, uint blockno)
       // 查询其他哈希桶时也要注意上锁
       acquire(&bcache.lock[i]);
       for(b = bcache.hashbucket[i].prev; b != &bcache.hashbucket[i]; b = b->prev){
-        if(b->refcnt == 0) {
+        if(b->refcnt == 0){
           // 记录buf的时间戳
           b->timestamp = ticks;
           b->dev = dev;
@@ -139,7 +139,7 @@ bread(uint dev, uint blockno)
   struct buf *b;
 
   b = bget(dev, blockno);
-  if(!b->valid) {
+  if(!b->valid){
     virtio_disk_rw(b, 0);
     b->valid = 1;
   }

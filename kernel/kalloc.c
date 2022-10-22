@@ -86,23 +86,21 @@ kalloc(void)
   acquire(&kmems[id].lock);
   r = kmems[id].freelist;
   // 优先分配当前CPU的freelist中的内存块
-  if(r)
+  if(r){
     kmems[id].freelist = r->next;
-  // 否则从其他CPU的freelist中窃取内存块
-  else
-  {
-    for (int i = 0; i < NCPU; i++)
-    {
-      if (i != id)
-      {
+  } else{
+    // 否则从其他CPU的freelist中窃取内存块
+    for (int i = 0; i < NCPU; i++){
+      if (i != id){
+        // 查询其他CPU的freelist时也要注意上锁
         acquire(&kmems[i].lock);
         r = kmems[i].freelist;
-        if(r)
-        {
+        if(r){
           kmems[i].freelist = r->next;
           release(&kmems[i].lock);
           break;
         }
+        // 若在kmems[i]中没有找到可用的内存块，不要忘记解锁
         release(&kmems[i].lock);
       }
     }
