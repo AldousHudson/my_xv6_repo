@@ -51,7 +51,7 @@ binit(void)
 
   // 给每个哈希桶初始化bcache锁和linked list
   for (int i = 0; i < NBUCKETS; i++){
-    initlock(&bcache.lock[i], "bcache");
+    initlock(&bcache.lock[i], "bcache_bucket");
     // Create linked list of buffers
     bcache.hashbucket[i].prev = &bcache.hashbucket[i];
     bcache.hashbucket[i].next = &bcache.hashbucket[i];
@@ -89,41 +89,41 @@ bget(uint dev, uint blockno)
     }
   }
 
-  // 当bget()查找数据块未命中时，bget()可从其他哈希桶选择一个未被使用的缓存块，移入到当前的哈希桶链表中使用。
   // Not cached.
   // Recycle the least recently used (LRU) unused buffer.
-  for (int i = 0; i < NBUCKETS; i++){
-    if (i != hash){
-      // 查询其他哈希桶时也要注意上锁
-      acquire(&bcache.lock[i]);
-      for(b = bcache.hashbucket[i].prev; b != &bcache.hashbucket[i]; b = b->prev){
-        if(b->refcnt == 0){
-          b->dev = dev;
-          b->blockno = blockno;
-          b->valid = 0;
-          b->refcnt = 1;
+  // 当bget()查找数据块未命中时，bget()可从其他哈希桶选择一个未被使用的缓存块，移入到当前的哈希桶链表中使用。
+  // next_hash表示下一个要探索的bucket，当它重新变成hash，说明所有的buffer都busy，此时产生panic。
+  int next_hash = (hash + 1) % NBUCKETS;
+  while (next_hash != hash) {
+    // 查询其他哈希桶时也要注意上锁
+    acquire(&bcache.lock[next_hash]);
+    for(b = bcache.hashbucket[next_hash].prev; b != &bcache.hashbucket[next_hash]; b = b->prev){
+      if(b->refcnt == 0){
+        b->dev = dev;
+        b->blockno = blockno;
+        b->valid = 0;
+        b->refcnt = 1;
 
-          // 从原先链表中移出b
-          b->next->prev = b->prev;
-          b->prev->next = b->next;
-          // 将b插入新链表
-          b->next = bcache.hashbucket[hash].next;
-          b->prev = &bcache.hashbucket[hash];
-          bcache.hashbucket[hash].next->prev = b;
-          bcache.hashbucket[hash].next = b;
+        // 从原先链表中移出b
+        b->next->prev = b->prev;
+        b->prev->next = b->next;
+        // 将b插入新链表
+        b->next = bcache.hashbucket[hash].next;
+        b->prev = &bcache.hashbucket[hash];
+        bcache.hashbucket[hash].next->prev = b;
+        bcache.hashbucket[hash].next = b;
 
-          release(&bcache.lock[i]);
-          release(&bcache.lock[hash]);
-          acquiresleep(&b->lock);
+        release(&bcache.lock[next_hash]);
+        release(&bcache.lock[hash]);
+        acquiresleep(&b->lock);
 
-          return b;
-        }
+        return b;
       }
-      // 若在哈希桶i中没有找到可用的缓存块，不要忘记解锁
-      release(&bcache.lock[i]);
     }
+    // 若在哈希桶i中没有找到可用的缓存块，不要忘记解锁
+    release(&bcache.lock[next_hash]);
+    next_hash = (next_hash + 1) % NBUCKETS;
   }
-  
   
   panic("bget: no buffers");
 }
