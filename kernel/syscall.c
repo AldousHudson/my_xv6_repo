@@ -7,6 +7,15 @@
 #include "syscall.h"
 #include "defs.h"
 
+//创建一个字符串数组来储存系统调用名
+static char
+syscall_name[23][16] = 
+{
+  "fork", "exit", "wait", "pipe", "read", "kill", "exec", "fstat", "chdir", "dup", "getpid", 
+  "sbrk", "sleep", "uptime", "open", "write", "mknod", "unlink", "link", "mkdir", "close", 
+  "trace", "sysinfo",
+};
+
 // Fetch the uint64 at addr from the current process.
 int
 fetchaddr(uint64 addr, uint64 *ip)
@@ -104,6 +113,8 @@ extern uint64 sys_unlink(void);
 extern uint64 sys_wait(void);
 extern uint64 sys_write(void);
 extern uint64 sys_uptime(void);
+extern uint64 sys_trace(void);
+extern uint64 sys_sysinfo(void);
 
 static uint64 (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -127,6 +138,8 @@ static uint64 (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
+[SYS_trace]   sys_trace,
+[SYS_sysinfo] sys_sysinfo,
 };
 
 void
@@ -135,9 +148,18 @@ syscall(void)
   int num;
   struct proc *p = myproc();
 
+  // 获取系统调用号，其存储在寄存器a7
   num = p->trapframe->a7;
+  // 获取系统调用的第一个参数，其存储在寄存器a0
+  int arg0 = p->trapframe->a0;
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
+    // 系统调用的返回值存储在寄存器a0
     p->trapframe->a0 = syscalls[num]();
+    // 根据mask筛选并打印需要跟踪的系统调用信息，mask有32位，某一位为1就需要跟踪那一种系统调用信息，可以跟踪多种。
+    if(p->trace_mask > 0 && (p->trace_mask & (1<<num)))
+    {
+      printf("%d: sys_%s(%d) -> %d\n", p->pid, syscall_name[num-1], arg0, p->trapframe->a0);
+    }
   } else {
     printf("%d %s: unknown sys call %d\n",
             p->pid, p->name, num);

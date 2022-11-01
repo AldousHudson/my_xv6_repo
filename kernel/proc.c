@@ -277,6 +277,9 @@ fork(void)
 
   np->parent = p;
 
+  // 子进程继承父进程的mask
+  np->trace_mask = p->trace_mask;
+
   // copy saved user registers.
   *(np->trapframe) = *(p->trapframe);
 
@@ -693,3 +696,31 @@ procdump(void)
     printf("\n");
   }
 }
+
+// sysinfo:计算空闲进程数量
+uint64
+get_nproc(void)
+{
+  struct proc *p;
+  uint64 nproc = 0;
+  for(p = proc; p < &proc[NPROC]; p++){
+    if(p->state == UNUSED)
+      nproc++;
+  }
+  return nproc;
+}
+
+// sysinfo:计算可用文件描述符数量
+uint64
+get_freefd(void)
+{
+  struct proc *p = myproc();
+  uint64 freefd = 0;
+  for(int fd = 0; fd < NOFILE; fd++){
+    if(p->ofile[fd] == 0){
+      freefd++;
+    }
+  }
+  return freefd;
+}
+
