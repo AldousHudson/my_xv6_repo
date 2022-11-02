@@ -149,6 +149,19 @@ UPROGS=\
 	$U/_grind\
 	$U/_wc\
 	$U/_zombie\
+	$U/_sleep\
+	$U/_pingpong\
+	$U/_primes\
+	$U/_find\
+	$U/_xargs\
+	# $U/_cow\
+	# $U/_uthread\
+	# $U/_call\
+	# $U/_kalloctest\
+	# $U/_bcachetest\
+	# $U/_mounttest\
+	# $U/_crashtest\
+
 
 ifeq ($(LAB),syscall)
 UPROGS += \
