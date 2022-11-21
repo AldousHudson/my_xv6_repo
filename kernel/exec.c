@@ -116,6 +116,13 @@ exec(char *path, char **argv)
   p->trapframe->sp = sp; // initial stack pointer
   proc_freepagetable(oldpagetable, oldsz);
 
+  // 将修改后的用户页表同步到独立内核页表
+  proc_kernel_uvmcopy(p->pagetable, p->k_pagetable, 0, p->sz);
+
+  // 输出第一个进程或刚载入程序的页表
+  if(p->pid == 1)
+    vmprint(p->pagetable);
+
   return argc; // this ends up in a0, the first argument to main(argc, argv)
 
  bad:

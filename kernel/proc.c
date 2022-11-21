@@ -34,14 +34,16 @@ procinit(void)
       // Allocate a page for the process's kernel stack.
       // Map it high in memory, followed by an invalid
       // guard page.
-      char *pa = kalloc();
+      char *pa = kalloc();  // 分配一个物理页, 返回其首地址
       if(pa == 0)
         panic("kalloc");
-      uint64 va = KSTACK((int) (p - proc));
-      kvmmap(va, (uint64)pa, PGSIZE, PTE_R | PTE_W);
-      p->kstack = va;
+      uint64 va = KSTACK((int) (p - proc));  // 计算内核栈所在的虚拟地址
+      kvmmap(va, (uint64)pa, PGSIZE, PTE_R | PTE_W);  // 在全局内核页表建立内核栈的映射
+      p->kstack = va;  // 将内核栈的虚拟地址存储于进程控制块
+
+      p->kstack_pa = (uint64)pa; // 把内核栈的物理地址pa拷贝到PCB新增的成员kstack_pa中
   }
-  kvminithart();
+  kvminithart(); // 切换到全局页表
 }
 
 // Must be called with interrupts disabled,
@@ -121,6 +123,21 @@ found:
     return 0;
   }
 
+  // 创建空的独立内核页表
+  p->k_pagetable = proc_kvminit();
+  
+  // // 在进程创建后再为其分配内核栈, 并将其映射到独立内核页表
+  // char *pa = kalloc();  // 分配一个物理页，返回其首地址
+  // if(pa == 0)
+  //   panic("kalloc");
+  // uint64 va = KSTACK((int) (p - proc));  // 计算内核栈所在的虚拟地址
+  // indv_kvmmap(p->k_pagetable, va, (uint64)pa, PGSIZE, PTE_R | PTE_W);
+  // p->kstack = va;  // 将内核栈的虚拟地址存储于进程控制块
+  // p->kstack_pa = (uint64)pa; // 把内核栈的物理地址pa拷贝到PCB新增的成员kstack_pa中
+
+  // 将内核栈映射到独立内核页表
+  proc_kvmmap(p->k_pagetable, p->kstack, p->kstack_pa, PGSIZE, PTE_R | PTE_W);
+
   // Set up new context to start executing at forkret,
   // which returns to user space.
   memset(&p->context, 0, sizeof(p->context));
@@ -129,6 +146,41 @@ found:
 
   return p;
 }
+
+// 释放进程的独立内核页表, 但不释放叶子页表指向的物理页帧
+void
+proc_free_k_pagetable(pagetable_t pagetable)
+{
+  // there are 2^9 = 512 PTEs in a page table.
+  for(int i = 0; i < 512; i++){
+    pte_t pte = pagetable[i];
+    // 如果当前pte只有valid置位了, 说明该pte处在1/2级页表中, 可以递归地清除该pte指向的page
+    if((pte & PTE_V) && (pte & (PTE_R|PTE_W|PTE_X)) == 0){
+      // this PTE points to a lower-level page table.
+      uint64 child = PTE2PA(pte);
+      proc_free_k_pagetable((pagetable_t)child);
+      pagetable[i] = 0;  
+    } else if(pte & PTE_V){
+      // 如果pagetable指向第三级页表, 将所有pte设为0
+      pagetable[i] = 0;
+    }
+  }
+  kfree((void*)pagetable);
+}
+
+// void
+// proc_free_k_pagetable(struct proc *p)
+// {
+//   // 先释放内核栈, 因为内核栈是不被共享的
+//   if (p->kstack){
+//     pte_t *pte = walk(p->k_pagetable, p->kstack, 0);
+//     kfree((void *)PTE2PA(*pte));
+//     p->kstack = 0;
+//   }
+
+//   // 再释放独立内核页表
+//   free_k_pagetable(p->k_pagetable);
+// }
 
 // free a proc structure and the data hanging from it,
 // including user pages.
@@ -141,6 +193,11 @@ freeproc(struct proc *p)
   p->trapframe = 0;
   if(p->pagetable)
     proc_freepagetable(p->pagetable, p->sz);
+  // 释放进程的独立内核页表
+  if(p->k_pagetable)
+    proc_free_k_pagetable(p->k_pagetable);
+  p->k_pagetable = 0;
+  
   p->pagetable = 0;
   p->sz = 0;
   p->pid = 0;
@@ -230,6 +287,9 @@ userinit(void)
 
   p->state = RUNNABLE;
 
+  //将第一个进程的用户页表包含在其内核页表中
+  proc_kernel_uvmcopy(p->pagetable, p->k_pagetable, 0, p->sz);
+
   release(&p->lock);
 }
 
@@ -249,6 +309,13 @@ growproc(int n)
   } else if(n < 0){
     sz = uvmdealloc(p->pagetable, sz, sz + n);
   }
+
+  // 将修改后的用户页表同步到独立内核页表
+  // // 考虑到内核页表内容是根据用户页表改变, 所以只增加/覆盖内容, 不删除内容
+  // if(n > 0){
+    proc_kernel_uvmcopy(p->pagetable, p->k_pagetable, p->sz, sz);
+  // }
+  
   p->sz = sz;
   return 0;
 }
@@ -274,6 +341,9 @@ fork(void)
     return -1;
   }
   np->sz = p->sz;
+
+  // 将修改后的用户页表同步到独立内核页表
+  proc_kernel_uvmcopy(np->pagetable, np->k_pagetable, 0, np->sz);
 
   np->parent = p;
 
@@ -473,7 +543,14 @@ scheduler(void)
         // before jumping back to us.
         p->state = RUNNING;
         c->proc = p;
+
+        // 切换到进程的独立内核页表
+        w_satp(MAKE_SATP(p->k_pagetable));
+        sfence_vma();
+        // 进行进程的切换
         swtch(&c->context, &p->context);
+        // 切换到全局页表
+        kvminithart();
 
         // Process is done running for now.
         // It should have changed its p->state before coming back.
