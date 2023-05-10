@@ -554,6 +554,7 @@ proc_kernel_uvmcopy(pagetable_t user_pagetable, pagetable_t k_pagetable, uint64 
   if (end >= PLIC)
     panic("proc_kernel_uvmcopy: user process space is overwritten to kernel process space");
 
+  // 将用户页表的页表项复制进内核页表
   for(va = start; va < end; va += PGSIZE){
     if((user_pte = walk(user_pagetable, va, 0)) == 0)
       panic("uvmcopy: pte should exist");
@@ -561,7 +562,6 @@ proc_kernel_uvmcopy(pagetable_t user_pagetable, pagetable_t k_pagetable, uint64 
     if((kernel_pte = walk(k_pagetable, va, 1)) == 0)
       panic("uvmcopy: pte should exist");
 
-  // 内核页表直接共享U用户页表的叶子页表, 即内核页表中次页表的部分目录项直接指向用户页表的叶子页表
   // 将PTE_U置为0, 使得内核能访问该虚拟地址
     *kernel_pte = (*user_pte) & (~PTE_U);
   }
